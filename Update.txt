@@ -1,0 +1,7 @@
+10/08/2025:
+    + Sửa page.tsx (cứ comment code cũ rồi copy hết file này vào là được)
+    + Sửa dashboard (thêm userinfo - đăng xuất đồ trong dashboard)
+    + Thêm simple-auth.ts trong lib 
+    + Thêm 3 file: simple-auth-guard.tsx, user-info.tsx, simple - login.tsx
+    
+
