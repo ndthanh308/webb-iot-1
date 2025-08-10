@@ -57,7 +57,7 @@ class SimpleAuthService {
         const user: User = snapshot.val();
         
         if (user.password !== password) {
-            throw new Error('Mật khẩu không chính xác');
+            throw new Error('❌ Mật khẩu không chính xác');
         }
 
         // Cập nhật last login
@@ -105,7 +105,7 @@ class SimpleAuthService {
         return this.getCurrentUser() !== null;
     }
 
-    // Kiểm tra quyền admin
+    // Kiểm tra quyền admin (thừa)
     isAdmin(): boolean {
         const user = this.getCurrentUser();
         return user?.role === 'admin';
