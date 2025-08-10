@@ -1,4 +1,4 @@
-10/08/2025:
+10/08/2025 10:17 AM:
     + Sửa page.tsx (cứ comment code cũ rồi copy hết file này vào là được) trong app
     + Sửa dashboard (thêm userinfo - đăng xuất đồ trong dashboard) trong components
     + Thêm simple-auth.ts trong lib 
