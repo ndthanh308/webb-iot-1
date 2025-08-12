@@ -8,7 +8,7 @@ export interface ControlCommands {
   decreaseTemp: () => Promise<void>;
   toggleLaser: (enable: boolean) => Promise<void>;
   toggleAreaSensor: (enable: boolean) => Promise<void>;
-  setACTemp: (temperature: number) => Promise<void>;
+  setACTemp: (temperature: number, type: string) => Promise<void>;
 }
 
 class MQTTCommandService {
@@ -52,7 +52,7 @@ class MQTTCommandService {
   }
 
   // Send AC temperature control
-  async sendACTemperatureCommand(temperature: number): Promise<void> {
+  async sendACTemperatureCommand(temperature: number, type : string): Promise<void> {
     try {
       // Validate temperature range
       if (temperature < 16 || temperature > 30) {
@@ -63,7 +63,7 @@ class MQTTCommandService {
       await firebaseDataService.storeCommandHistory('ac_temperature', temperature);
       this.currentACTemp = temperature; // Update local tracking
 
-      const success = await mqttService.sendCommand('increase_temp', temperature);
+      const success = await mqttService.sendCommand(type, temperature);
       if (success) {
         console.log(`🌡️ AC temperature command sent via MQTT: ${temperature}°C`);
       }
@@ -105,7 +105,7 @@ class MQTTCommandService {
   async increaseTemperature(): Promise<void> {
     try {
       const newTemp = Math.min(30, this.currentACTemp + 1);
-      await this.sendACTemperatureCommand(newTemp);
+      await this.sendACTemperatureCommand(newTemp, 'increase_temp');
     } catch (error) {
       console.error('❌ Failed to increase temperature:', error);
       throw error;
@@ -115,7 +115,7 @@ class MQTTCommandService {
   async decreaseTemperature(): Promise<void> {
     try {
       const newTemp = Math.max(16, this.currentACTemp - 1);
-      await this.sendACTemperatureCommand(newTemp);
+      await this.sendACTemperatureCommand(newTemp, 'decrease_temp');
     } catch (error) {
       console.error('❌ Failed to decrease temperature:', error);
       throw error;
@@ -154,7 +154,7 @@ export const controlCommands: ControlCommands = {
   decreaseTemp: () => mqttCommandService.decreaseTemperature(),
   toggleLaser: (enable: boolean) => mqttCommandService.sendLaserGameCommand(enable),
   toggleAreaSensor: (enable: boolean) => mqttCommandService.sendAreaSensorCommand(enable),
-  setACTemp: (temperature: number) => mqttCommandService.sendACTemperatureCommand(temperature)
+  setACTemp: (temperature: number, type: string) => mqttCommandService.sendACTemperatureCommand(temperature, type)
 };
 
 // Export additional utility functions
