@@ -719,11 +719,6 @@ if (typeof window !== 'undefined') {
     console.log('✅ MQTT module loaded');
   });
 
-  import('@emailjs/browser').then((module) => {
-    emailjs = module.default;
-    emailjs.init('wDHGbOUSzglBM7ePp');
-    console.log('✅ EmailJS module loaded');
-  });
 }
 
 // 📊 INTERFACES
