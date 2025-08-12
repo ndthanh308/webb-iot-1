@@ -308,28 +308,6 @@ class IoTDataService {
     });
   }
 
-  async sendControlCommand(command: string, value: any): Promise<boolean> {
-    try {
-      console.log(`📡 Sending to ESP32: ${command} = ${value}`);
-      
-      // Send via MQTT to ESP32
-      const mqttSuccess = await mqttService.sendCommand(command, value);
-      
-      if (mqttSuccess) {
-        // Store command in Firebase
-        await firebaseDataService.storeCommandHistory(command, value);
-        console.log(`✅ Command sent: ${command}`);
-        return true;
-      } else {
-        console.error(`❌ MQTT command failed: ${command}`);
-        return false;
-      }
-    } catch (error) {
-      console.error('❌ Command error:', error);
-      return false;
-    }
-  }
-
   // 📊 CHART DATA (delegate to Firebase service)
   async getChartData(): Promise<ChartDataPoint[]> {
     return await firebaseDataService.getChartData();
@@ -352,18 +330,6 @@ class IoTDataService {
     return mqttService.isConnected();
   }
 
-  async requestNotificationPermission(): Promise<boolean> {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      return permission === 'granted';
-    }
-    return false;
-  }
-
-  resetAlertCooldown(): void {
-    mqttService.resetAlertCooldown();
-    console.log('🔄 Alert cooldown reset');
-  }
 }
 
 export const iotDataService = new IoTDataService();

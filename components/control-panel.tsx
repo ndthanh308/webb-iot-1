@@ -195,7 +195,7 @@ export default function ControlPanel() {
                 setControls(prev => ({ ...prev, ac_temperature: newTemp }));
               }}
               onValueCommit={(value) => {
-                handleCommand('setACTemp', () => controlCommands.setACTemp(value[0]));
+                handleCommand('setACTemp', () => controlCommands.setACTemp(value[0], 'increase_temp'));
               }}
               max={30}
               min={16}

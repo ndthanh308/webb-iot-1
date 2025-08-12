@@ -996,7 +996,6 @@ class MQTTService {
 
       this.sensorData.last_updated = Date.now();
       this.storeSensorDataToFirebase();
-      this.checkAlertsPartial();
       this.notifyCallbacksWithCurrentData();
 
     } catch (error) {
@@ -1025,71 +1024,7 @@ class MQTTService {
     }
   }
 
-  private async checkAlertsPartial() {
-    const now = Date.now();
-    const timeSinceLastAlert = now - this.lastAlertTime;
 
-    if (timeSinceLastAlert < this.ALERT_COOLDOWN) return;
-
-    const shouldAlert = (
-      (this.sensorData.food_percentage !== undefined && this.sensorData.food_percentage < 20) ||
-      (this.sensorData.water_percentage !== undefined && this.sensorData.water_percentage < 20)
-    );
-
-    if (shouldAlert) {
-      console.log('🚨 Sending alert for low levels');
-      await this.sendEmailAlertPartial();
-      this.lastAlertTime = now;
-    }
-  }
-
-  private async sendEmailAlertPartial() {
-    if (!emailjs) {
-      console.warn('⚠️ EmailJS not loaded, skipping email alert');
-      return;
-    }
-
-    try {
-      const messages = [];
-      if (this.sensorData.food_percentage !== undefined && this.sensorData.food_percentage < 20) {
-        messages.push(`🍽️ Food level is critically low: ${this.sensorData.food_percentage}%`);
-      }
-      if (this.sensorData.water_percentage !== undefined && this.sensorData.water_percentage < 20) {
-        messages.push(`💧 Water level is critically low: ${this.sensorData.water_percentage}%`);
-      }
-
-      if (messages.length === 0) return;
-
-      const emailParams = {
-        to_email: 'owner@example.com',
-        from_name: 'Cat Care IoT System',
-        subject: '🚨 Cat Care Alert - Low Supplies Detected',
-        message: `
-⚠️ URGENT: Your cat's supplies need attention!
-
-${messages.join('\n')}
-
-📊 Current Status:
-• Food Level: ${this.sensorData.food_percentage ?? 'N/A'}%
-• Water Level: ${this.sensorData.water_percentage ?? 'N/A'}%
-• Temperature: ${this.sensorData.temperature?.toFixed(1) ?? 'N/A'}°C
-• Humidity: ${this.sensorData.humidity?.toFixed(1) ?? 'N/A'}%
-
-🕐 Alert Time: ${new Date().toLocaleString('vi-VN')}
-
-Please refill your cat's supplies as soon as possible.
-
-Best regards,
-Cat Care IoT System 🐱
-        `.trim()
-      };
-
-      await emailjs.send('service_dd66tu5', 'template_p4qoknm', emailParams);
-      console.log('✅ Email alert sent successfully');
-    } catch (error) {
-      console.error('❌ Failed to send email alert:', error);
-    }
-  }
 
   private notifyCallbacksWithCurrentData() {
     const currentData: Partial<IoTSensorData> & { last_updated: number } = {
@@ -1211,11 +1146,6 @@ Cat Care IoT System 🐱
 
   public isConnected(): boolean {
     return this.connected;
-  }
-
-  public resetAlertCooldown(): void {
-    this.lastAlertTime = 0;
-    console.log('🔄 Alert cooldown reset');
   }
 
   public disconnect() {
